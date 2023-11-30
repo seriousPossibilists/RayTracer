@@ -1,28 +1,15 @@
 #include <windows.h>
 #include <iostream>
-#include <sstream>
-#include <iomanip>
+#include "Renderer.h"
 
 #define u32 uint32_t
 
 const char g_szClassName[] = "myWindowClass";
 int width, height;
-void* memory;
+void* memory = 0;
 BITMAPINFO bitmap_info;
-std::string finalHEX = "";
-int RGB[3] = { 1, 90, 45 };
 
-int hexadecimalToDecimal(std::string hexVal)
-{
-    unsigned int x;
-    std::stringstream ss;
-    ss << std::hex << hexVal;
-    ss >> x;
-    // output it as a signed type
-    return static_cast<unsigned int>(x);
-}
-
-
+Renderer renderer;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -40,19 +27,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void RGBtoHex(int decimal_value)
-{
-    std::stringstream ss;
-    ss << std::hex << decimal_value; // int decimal_value
-    std::string res(ss.str());
 
-    if (size(res) == 1)
-    {
-        res = "0" + res;
-    }
-
-    finalHEX += res;
-}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
@@ -98,7 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         g_szClassName,
         "The title of my window",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 400, 400,
+        CW_USEDEFAULT, CW_USEDEFAULT, 800, 800,
         NULL, NULL, hInstance, NULL);
 
     if (hwnd == NULL)
@@ -126,6 +101,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     HDC hdc = GetDC(hwnd);
 
+    for (int i = 0; i < height; ++i)
+    {
+        for (int j = 0; j < width; ++j)
+        {
+            *pixel = renderer.CalcPixel(i, j, 800, 800);
+            ++pixel; 
+        }
+    }
+
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
@@ -135,20 +119,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
 
-        RGB[0] = rand() % 256;
-        RGB[1] = rand() % 256;
-        RGB[2] = rand() % 256;
-
-        RGBtoHex(RGB[0]);
-        RGBtoHex(RGB[1]);
-        RGBtoHex(RGB[2]);
-        *pixel = hexadecimalToDecimal(finalHEX);
-        ++pixel;
-        finalHEX = "";
-
         StretchDIBits(hdc, 0, 0, width, height, 0, 0, width, height, memory, &bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 
     }
 
-    return Msg.wParam;
+    return static_cast<int>(Msg.wParam);
 }
