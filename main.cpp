@@ -1,6 +1,5 @@
 #include <windows.h>
 #include "Renderer.h"
-#include "vec3.h"
 #include <tchar.h>
 #include <wchar.h>
 
@@ -10,7 +9,6 @@ void* memory = 0;
 BITMAPINFO bitmap_info;
 
 Renderer renderer;
-vec3 vector;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
