@@ -1,8 +1,8 @@
 #include <windows.h>
-#include <iostream>
 #include "Renderer.h"
-
-#define u32 uint32_t
+#include "vec3.h"
+#include <tchar.h>
+#include <wchar.h>
 
 const char g_szClassName[] = "myWindowClass";
 int width, height;
@@ -10,13 +10,23 @@ void* memory = 0;
 BITMAPINFO bitmap_info;
 
 Renderer renderer;
+vec3 vector;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    wchar_t Umsg[32];
+    
     switch (msg)
     {
+    case WM_KEYDOWN:
+        swprintf_s(Umsg, L"WM_SYSKEYDOWN: 0x%x\n", wParam);
+        OutputDebugStringW(Umsg);
+        std::cout << Umsg << "\n";
+        break;
+
     case WM_CLOSE:
         DestroyWindow(hwnd);
+        std::cout << "Hello" << "\n";
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -73,7 +83,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         g_szClassName,
         "The title of my window",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 800, 800,
+        CW_USEDEFAULT, CW_USEDEFAULT, 1000, 1000,
         NULL, NULL, hInstance, NULL);
 
     if (hwnd == NULL)
@@ -97,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     bitmap_info.bmiHeader.biBitCount = 32;
     bitmap_info.bmiHeader.biCompression = BI_RGB;
 
-    u32* pixel = (u32*)memory;
+    uint32_t* pixel = (uint32_t*)memory;
 
     HDC hdc = GetDC(hwnd);
 
@@ -105,9 +115,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     {
         for (int j = 0; j < width; ++j)
         {
-            *pixel = renderer.CalcPixel(i, j, 800, 800);
+            *pixel = renderer.CalcPixel(j, i, 800, 800);
             ++pixel; 
         }
+        std::clog << "\rScanlines remaining: " << (height - i) << ' ' << std::flush;
     }
 
     ShowWindow(hwnd, nCmdShow);
