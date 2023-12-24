@@ -4,10 +4,10 @@
 
 uint32_t Renderer::CalcPixel(int pixelX, int pixelY, int screenWidth, int screenHeight)
 {
-	float radius = 0.5f * 800;
+	float radius = 0.5f * 1000;
 
-	glm::vec3 rayDirection = glm::vec3(pixelX - 500, pixelY - 500, -1.0f * 800);
-	glm::vec3 rayOrigin = glm::vec3(0, 0, 2.0f * 800);
+	glm::vec3 rayDirection = glm::vec3(pixelX - 500, pixelY - 500, -1.0f * 1000);
+	glm::vec3 rayOrigin = glm::vec3(0, 0.0f * 1000, 2.0f * 1000);
 
 
 	float a = glm::dot(rayDirection, rayDirection);
