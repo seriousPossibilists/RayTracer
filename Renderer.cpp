@@ -1,13 +1,15 @@
 #include "Renderer.h"
-#include <glm/glm.hpp>
 
 
-uint32_t Renderer::CalcPixel(int pixelX, int pixelY, int screenWidth, int screenHeight)
+glm::vec3 Renderer::CalcPixel(int pixelX, int pixelY, int sw, int sh, glm::vec3 rayOrg)
 {
-	float radius = 0.5f * 1000;
+	float radius = 0.5f * sw;
 
-	glm::vec3 rayDirection = glm::vec3(pixelX - 500, pixelY - 500, -1.0f * 1000);
-	glm::vec3 rayOrigin = glm::vec3(0, 0.0f * 1000, 2.0f * 1000);
+	glm::vec3 rayDirection = glm::vec3(pixelX - (sw * 0.5), pixelY - (sh * 0.5), -1.0f * sw);
+	// glm::vec3 rayOrigin = glm::vec3(0.0f * sw, 0.0f * sh, 2.0f * sh);
+	glm::vec3 rayOrigin = rayOrg;
+	//scaling by screen coords
+	rayOrigin *= glm::vec3(sw, sh, sw);
 
 
 	float a = glm::dot(rayDirection, rayDirection);
@@ -19,7 +21,7 @@ uint32_t Renderer::CalcPixel(int pixelX, int pixelY, int screenWidth, int screen
 	{
 		glm::vec3 pixelColor = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::clamp(pixelColor, 1.0f, 0.0f);
-		return ((int)(pixelColor.x * 255) << 16) | ((int)(pixelColor.y * 255) << 8) | (int)(pixelColor.z * 255);
+		return pixelColor;
 	};
 
 	// ray has hit sphere; computing hit position;
@@ -41,9 +43,7 @@ uint32_t Renderer::CalcPixel(int pixelX, int pixelY, int screenWidth, int screen
 	float angle = glm::max(glm::dot(normal, -lightDirection), 0.0f); // = cos(angle)
 
 
-	glm::vec3 pixelColor = glm::vec3(angle, angle, 0);
-
-
-
-	return ((int)(pixelColor.x * 255) << 16) | ((int)(pixelColor.y * 255) << 8) | (int)(pixelColor.z * 255);
+	glm::vec3 pixelColor = glm::vec3(angle + 0.1f, angle, 0);
+	glm::clamp(pixelColor, 1.0f, 0.0f);
+	return pixelColor;
 }
