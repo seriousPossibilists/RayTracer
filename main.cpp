@@ -1,93 +1,58 @@
-#include <glad\glad.h>
-#include <GLFW\glfw3.h>
-#include <iostream>
-#include "Renderer.h"
 
-Renderer renderer;
+#include <SFML/Graphics.hpp>
 
-glm::vec3 camRayOrigin = glm::vec3(0.0f, 0.0f, 2.0f);
+int width = 800;
+int height = 600;
+std::vector<sf::Uint8> image(width* height * 4);
 
-int screenWidth = 800;
-int screenHeight = 800;
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void setupTex()
+// set pixel (x, y):
 {
-    if (key == GLFW_KEY_W && action == GLFW_REPEAT)
-        camRayOrigin.y += 0.01f;
-    if (key == GLFW_KEY_S && action == GLFW_REPEAT)
-        camRayOrigin.y -= 0.01f;
-    if (key == GLFW_KEY_A && action == GLFW_REPEAT)
-        camRayOrigin.x -= 0.01f;
-    if (key == GLFW_KEY_D && action == GLFW_REPEAT)
-        camRayOrigin.x += 0.01f;
-}
-//function to take pixel colors from renderer.h calcPixel func
-void setPixelColor(int sw, int sh)
-{
-    for (int i = 0; i < sw; i++)
-    {
-        for (int j = 0; j < sh; j++)
-        {
-            glm::vec3 color = renderer.CalcPixel(i, j, sw, sh, camRayOrigin);
-            glColor3f(color.x, color.y, color.z);
-            glVertex2i(i, j);
-
-        }
-    }
+	for (int x = 0; x < width; x++)
+	{
+		for (int y = 0; y < width; y++)
+		{
+			double r = ((double)rand() / (RAND_MAX));
+			image[(x + y * width) * 4 + 0] = r;
+			 r = ((double)rand() / (RAND_MAX));
+			image[(x + y * width) * 4 + 1] = r;
+			 r = ((double)rand() / (RAND_MAX));
+			image[(x + y * width) * 4 + 2] = r;
+			//alpha channel is 1
+			image[(x + y * width) * 4 + 3] = 1.0f;
+		}
+	}
 }
 
-int main(void)
+int main()
 {
-    GLFWwindow* window;
+	sf::RenderWindow window(sf::VideoMode(width, height), "Not Tetris");
 
-    if (!glfwInit())
-        return -1;
+	sf::Texture texture;
 
-    window = glfwCreateWindow(screenWidth, screenHeight, "Raytracer", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
+	setupTex();
+	// update texture:
+	texture.update(image.data());
 
-    glfwSetKeyCallback(window, key_callback);
+	sf::Sprite sprite;
+	sprite.setTexture(texture);
 
-    glfwMakeContextCurrent(window);
-
-    //Loading OpenGL
-    gladLoadGL();
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_TEXTURE_2D);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(-1.0, -1.0, 0.0);
-    glScalef(2.0 / float(screenWidth), 2.0 / float(screenHeight), 0.0);
+		// inside the main loop, between window.clear() and window.display()
 
 
-    //main game loop
-    while (!glfwWindowShouldClose(window))
-    {
+	sf::Event event;
 
-        glfwSetTime(0);
-        double t1 = glfwGetTime();
+	while (window.isOpen()) {
 
-        glBegin(GL_POINTS);
-        setPixelColor(screenWidth, screenHeight);
-        glFinish();
-        glfwSwapBuffers(window);
+		while (window.pollEvent(event)) {
 
-        double t2 = glfwGetTime();
-        std::cout << (t2 - t1) * 1000 << " milliseconds" << "\n";
+			if (event.type == sf::Event::Closed) {
 
-        glfwPollEvents();
-    }
+				window.close();
+			}
+		}
+		window.draw(sprite);
+	}
 
-    glfwTerminate();
-    exit(0);
-    return 0;
+	return 0;
 }
-
