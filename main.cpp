@@ -10,16 +10,16 @@ void setupTex()
 {
 	for (int x = 0; x < width; x++)
 	{
-		for (int y = 0; y < width; y++)
+		for (int y = 0; y < height; y++)
 		{
 			double r = ((double)rand() / (RAND_MAX));
-			image[(x + y * width) * 4 + 0] = r;
+			image[(x + y * width) * 4 + 0] = (sf::Uint8)r * 255;
 			 r = ((double)rand() / (RAND_MAX));
-			image[(x + y * width) * 4 + 1] = r;
+			image[(x + y * width) * 4 + 1] = (sf::Uint8)r * 255;
 			 r = ((double)rand() / (RAND_MAX));
-			image[(x + y * width) * 4 + 2] = r;
+			image[(x + y * width) * 4 + 2] = (sf::Uint8)r * 255;
 			//alpha channel is 1
-			image[(x + y * width) * 4 + 3] = 1.0f;
+			image[(x + y * width) * 4 + 3] = 255;
 		}
 	}
 }
@@ -49,9 +49,10 @@ int main()
 			if (event.type == sf::Event::Closed) {
 
 				window.close();
+				window.draw(sprite);
+
 			}
 		}
-		window.draw(sprite);
 	}
 
 	return 0;
