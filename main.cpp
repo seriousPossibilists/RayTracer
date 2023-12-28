@@ -8,8 +8,10 @@ int width = 1000;
 int height = 1000;
 std::vector<sf::Uint8> image(width* height * 4);
 glm::vec3 rayOrigin = glm::vec3(0.0f, 0.0f, 2.0f);
+glm::vec3 directionVector = glm::vec3(0.0f, 0.0f, 0.0f);
 
-bool keyPressed = false;
+bool leftKeyPressed = false;
+bool rightKeyPressed = false;
 
 Renderer renderer;
 
@@ -46,7 +48,6 @@ int main()
 	sf::Texture texture;
 	texture.create(width, height);
 
-	window.setKeyRepeatEnabled(false);
 
 	setupTex(width, height, rayOrigin);
 	// update texture:
@@ -72,28 +73,37 @@ int main()
 				window.close();
 
 			}
-			if (event.type == sf::Event::KeyPressed) {
-				keyPressed = true;
-			}
-			if (event.type == sf::Event::KeyReleased) {
-				keyPressed = false;
-			}
-			if (keyPressed)
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 			{
+				// move left..
+				leftKeyPressed = true;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				// move right...
+				/*
 				rayOrigin.x += 0.05f;
 				setupTex(width, height, rayOrigin);
 				texture.update(image.data());
 
+				window.draw(sprite);
+				window.display(); */
+				rightKeyPressed = true;
+				directionVector.x = 0.05f;
+
 			}
 
-
-			window.clear(sf::Color::Black);
-			window.draw(sprite);
-			window.display();
-			end = std::chrono::high_resolution_clock::now();
-			fps = (float)1e9 / (float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-			std::cout << fps << "\n";
 		}
+		rayOrigin += directionVector;
+		setupTex(width, height, rayOrigin);
+		texture.update(image.data());
+
+
+		window.draw(sprite);
+		window.display();
+		end = std::chrono::high_resolution_clock::now();
+		fps = (float)1e9 / (float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+		std::cout << fps << "\n";
 	}
 
 	return 0;
