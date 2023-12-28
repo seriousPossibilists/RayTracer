@@ -18,9 +18,9 @@ Renderer renderer;
 void setupTex(int w, int h, glm::vec3 rayOrigin)
 {
 	
-	for (int x = 0; x < width; x++)
+	for (int y = 0; y < height; y++)
 	{
-		for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
 		{
 			//height - y as sfml uses flipped coordinates for the y axis
 			glm::vec3 color = renderer.CalcPixel(x, height - y, w, h, rayOrigin);
@@ -47,7 +47,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(width, height), "Raytracer");
 	sf::Texture texture;
 	texture.create(width, height);
-
+	window.setFramerateLimit(60);
 
 	setupTex(width, height, rayOrigin);
 	// update texture:
@@ -64,20 +64,16 @@ int main()
 	sf::Event event;
 
 	while (window.isOpen()) {
+		start = std::chrono::high_resolution_clock::now();
 
 		while (window.pollEvent(event)) {
-			start = std::chrono::high_resolution_clock::now();
 
 			if (event.type == sf::Event::Closed) {
 
 				window.close();
 
 			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			{
-				// move left..
-				leftKeyPressed = true;
-			}
+
 			else if (event.type == sf::Event::KeyPressed)
 			{
 				// move right...
@@ -91,24 +87,29 @@ int main()
 				if (event.key.scancode == sf::Keyboard::Scan::Right)
 				{
 					rightKeyPressed = true;
-					directionVector.x = 0.1f;
 
 				}
 
 			}
 
 		}
-		rayOrigin += directionVector;
-		setupTex(width, height, rayOrigin);
-		texture.update(image.data());
+		
+		if (rightKeyPressed)
+		{	
+			rayOrigin.x += 0.1f;
+			setupTex(width, height, rayOrigin);
+			texture.update(image.data());
+		}
 
 
 		window.draw(sprite);
 		window.display();
+
 		end = std::chrono::high_resolution_clock::now();
 		fps = (float)1e9 / (float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 		std::cout << fps << "\n";
 	}
+
 
 	return 0;
 }
