@@ -78,7 +78,7 @@ int main()
 				// move left..
 				leftKeyPressed = true;
 			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			else if (event.type == sf::Event::KeyPressed)
 			{
 				// move right...
 				/*
@@ -88,8 +88,12 @@ int main()
 
 				window.draw(sprite);
 				window.display(); */
-				rightKeyPressed = true;
-				directionVector.x = 0.05f;
+				if (event.key.scancode == sf::Keyboard::Scan::Right)
+				{
+					rightKeyPressed = true;
+					directionVector.x = 0.1f;
+
+				}
 
 			}
 
